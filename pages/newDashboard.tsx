@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import '@scuf/common/honeywell-compact-dark/theme.css';
 import { Grid, Card, SidebarLayout, Footer, Header, Icon, Button, Table } from '@scuf/common';
 import { Chart } from '@scuf/charts';
+import { genChart, graph_data } from '../data';
 
 class Dashboard extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
@@ -10,15 +11,12 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
         this.state = {
             sidebarCollapsed: false,
             settingsCollapsed: false,
-            plot1: [51,54,62,70,73,78,79,76,72,67,61,52],
-            plot2: [35,37,43,51,60,67,70,69,64,54,43,37],
+            graphData: graph_data,
             items: [
                 {name: 'Chart 1', content: <div className="placeholder max-width" /> }, 
-                // {name: 'Chart 2', content: <div className="placeholder max-width" /> }
             ],
             details: [
                 {name: 'Table 1'},
-                // {name: 'Table 2'}
             ],
             specification: [
                 {param: 'Length', value: '12.5 meters'},
@@ -74,27 +72,24 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
     }
     
     changeGraph() {
-        let pos1 = Math.floor(Math.random() * 11);
-        let pos2 = Math.floor(Math.random() * 11);
-        let val1 = Math.floor(Math.random() * 40) + 49;
-        let val2 = Math.floor(Math.random() * 30) + 59;
-        let arr1 = this.state.plot1;
-        let arr2 = this.state.plot2;
-        arr1[pos1] = val1;
-        arr2[pos2] = val2;
-        this.setState(() => ({ plot1: arr1 }));
-        this.setState(() => ({ plot2: arr2 }));
+        let newGraphData = this.state.graphData.map((item: any) => {
+            let pos = Math.floor(Math.random() * 11);
+            let val = Math.floor(Math.random() * 40) + 49;
+            item.plot[pos] = val;
+            return item;
+        })
+
+        this.setState(() => ({ graphData: newGraphData }));
     }
 
     genCard(item: any, index: any){
         return (
              <Grid.Column width={8} mWidth={12} key={index}>
                 <Card>
-                    <Card.Header title="Asset Health Chart"> <Icon name="settings"/></Card.Header>
+                    <Card.Header title={item.name}> <Icon name="settings"/></Card.Header>
                     <Card.Content>
-                        <Chart title="Chart 1" height="655">
-                            <Chart.Line name="Temperature" data={this.state.plot1} color="#e01616"/>
-                            <Chart.Line name="Humidity" data={this.state.plot2} color="#1e87d8"/>
+                        <Chart title="Asset Health Chart" height="655">
+                            {this.state.graphData.map((item: any) => genChart(item))}
                         </Chart>
                         {item.content}
                     </Card.Content>
@@ -135,7 +130,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                         <Grid>
                             <Grid.Row>
                                 <Grid.Column width={12}>
-                                    <div style={{marginTop: '5em'}}><h1>Asset Dashboard</h1></div>
+                                <div style={{marginTop: '2em'}}><h1>Asset Dashboard</h1></div>
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
