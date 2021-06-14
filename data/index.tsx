@@ -1,4 +1,4 @@
-import { Chart } from "@scuf/charts";
+import { Chart, TimeSeries } from "@scuf/charts";
 
 export const graph_data = [
     {
@@ -13,13 +13,15 @@ export const graph_data = [
     },
     {
         variable: "Pressure",
-        plot: [30,33,40,52,58,64,75,68,61,57,50,40],
+        plot: [30,38,45,51,55,59,64,58,51,43,35,30],
         color: "white"
     }
 ];
 
 export function genChart(item: any){
     return(
-        <Chart.Line name={item.variable} data={item.plot} color={item.color}/>
+        <TimeSeries>
+            <TimeSeries.Line name={item.variable} data={item.plot} color={item.color}/>
+        </TimeSeries>
     )
 }

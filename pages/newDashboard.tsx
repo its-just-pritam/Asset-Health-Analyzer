@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '@scuf/common/honeywell-compact-dark/theme.css';
 import { Grid, Card, SidebarLayout, Footer, Header, Icon, Button, Table } from '@scuf/common';
-import { Chart } from '@scuf/charts';
 import { genChart, graph_data } from '../data';
 
 class Dashboard extends React.Component<{}, { [key: string]: any}> {
@@ -13,7 +12,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
             settingsCollapsed: false,
             graphData: graph_data,
             items: [
-                {name: 'Chart 1', content: <div className="placeholder max-width" /> }, 
+                {name: 'Cold Storage', content: <div className="placeholder max-width" /> }, 
             ],
             details: [
                 {name: 'Table 1'},
@@ -72,38 +71,39 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
     }
     
     changeGraph() {
-        let newGraphData = this.state.graphData.map((item: any) => {
-            let pos = Math.floor(Math.random() * 11);
-            let val = Math.floor(Math.random() * 40) + 49;
-            item.plot[pos] = val;
-            return item;
-        })
+        // let newGraphData = this.state.graphData.map((item: any) => {
+        //     let pos = Math.floor(Math.random() * 11);
+        //     let val = Math.floor(Math.random() * 40) + 49;
+        //     item.plot[pos] = val;
+        //     return item;
+        // })
 
-        this.setState(() => ({ graphData: newGraphData }));
+        let tempGraphData = this.state.graphData;
+        this.setState(() => ({ graphData: tempGraphData }));
     }
 
     genCard(item: any, index: any){
         return (
-             <Grid.Column width={8} mWidth={12} key={index}>
-                <Card>
-                    <Card.Header title={item.name}> <Icon name="settings"/></Card.Header>
-                    <Card.Content>
-                        <Chart title="Asset Health Chart" height="655">
-                            {this.state.graphData.map((item: any) => genChart(item))}
-                        </Chart>
-                        {item.content}
-                    </Card.Content>
-                </Card>
-            </Grid.Column>
+            <Grid.Row>
+                <Grid.Column width={10} mWidth={12} key={index}>
+                    <Card>
+                        <Card.Header title={item.name}> <Icon name="settings"/></Card.Header>
+                        <Card.Content>
+                                {this.state.graphData.map((item: any) => genChart(item))}
+                            {item.content}
+                        </Card.Content>
+                    </Card>
+                </Grid.Column>
+            </Grid.Row>
         )
     }
     
     render() {
-        const { sidebarCollapsed, items, settingsCollapsed, details } = this.state;
+        const { sidebarCollapsed, items, settingsCollapsed } = this.state;
         return (
             <section className="page-example-wrap">
                 <Header title="Asset Health Analyzer"  onMenuToggle={() => this.onCollapsedClick()} active={sidebarCollapsed}>
-		            <Button type="primary" content="Refresh" onClick={() => this.changeGraph()} />
+		            {/* <Button type="primary" content="Refresh" onClick={() => this.changeGraph()} /> */}
                     <Header.Item href="#">
                         <Icon size="large" root="building" name="user" />
                     </Header.Item>
@@ -129,25 +129,40 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                     <SidebarLayout.Content>
                         <Grid>
                             <Grid.Row>
-                                <Grid.Column width={12}>
+                                <Grid.Column width={10}>
                                 <div style={{marginTop: '2em'}}><h1>Asset Dashboard</h1></div>
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
-                                <Grid.Column width={8} mOrder={3} sOrder={1} >
+                                <Grid.Column width={4} mOrder={3} sOrder={1} >
                                     <Card>
                                     <Card.Header title='Select Assets'> <Icon name="badge-info"/></Card.Header>
                                         <Card.Content>
+                                            <div style={{marginTop: '3em'}}></div>
                                         </Card.Content>
                                         <Card.Footer>
                                             <Icon root="common" name="caret-right" className="right"/>
                                         </Card.Footer>
                                     </Card>
                                 </Grid.Column>
-                                <Grid.Column width={4} mOrder={1} sOrder={3}>
+                                <Grid.Column width={3} mOrder={1} sOrder={3}>
+                                    <Link to="/add-variables">
+                                        <Card>
+                                            <Card.Header title='Add Variables'> <Icon name="badge-info"/></Card.Header>
+                                            <Card.Content>
+                                                <div style={{marginTop: '3em'}}></div>
+                                            </Card.Content>
+                                            <Card.Footer>
+                                                <Icon root="common" name="caret-right" className="right"/>
+                                            </Card.Footer>
+                                        </Card>
+                                    </Link>
+                                </Grid.Column>
+                                <Grid.Column width={3} mOrder={1} sOrder={3}>
                                     <Card>
                                         <Card.Header title='Add Events'> <Icon name="badge-info"/></Card.Header>
                                         <Card.Content>
+                                            <div style={{marginTop: '3em'}}></div>
                                         </Card.Content>
                                         <Card.Footer>
                                             <Icon root="common" name="caret-right" className="right"/>
@@ -156,45 +171,44 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
-                            <Grid.Column width={4} mOrder={2} sOrder={2}>
-                                <Card>
-                                    <Card.Header title="Show Faults"> <Icon name="badge-info"/></Card.Header>
-                                    <Card.Content>
-                                    </Card.Content>
-                                    <Card.Footer>
-                                        <Icon root="common" name="caret-right" className="right"/>
-                                    </Card.Footer>
-                                </Card>
-                            </Grid.Column>
-                            <Grid.Column width={4} mOrder={2} sOrder={2}>
-                                <Link to="/add-variables">
+                                <Grid.Column width={4} mOrder={2} sOrder={2}>
                                     <Card>
-                                        <Card.Header title="Add Variables"> <Icon name="badge-info"/></Card.Header>
+                                        <Card.Header title="Show Faults"> <Icon name="badge-info"/></Card.Header>
                                         <Card.Content>
+                                            <div style={{marginTop: '3em'}}></div>
                                         </Card.Content>
                                         <Card.Footer>
                                             <Icon root="common" name="caret-right" className="right"/>
                                         </Card.Footer>
                                     </Card>
-                                </Link>
-                            </Grid.Column>
-                            <Grid.Column width={4} mOrder={2} sOrder={2}>
-                                <Card>
-                                    <Card.Header title="Add Rules"> <Icon name="badge-info"/></Card.Header>
-                                    <Card.Content>
-                                    </Card.Content>
-                                    <Card.Footer>
-                                        <Icon root="common" name="caret-right" className="right"/>
-                                    </Card.Footer>
-                                </Card>
-                            </Grid.Column>
+                                </Grid.Column>
+                                <Grid.Column width={3} mOrder={2} sOrder={2}>
+                                        <Card>
+                                            <Card.Header title="Remove Variables"> <Icon name="badge-info"/></Card.Header>
+                                            <Card.Content>
+                                                <div style={{marginTop: '3em'}}></div>
+                                            </Card.Content>
+                                            <Card.Footer>
+                                                <Icon root="common" name="caret-right" className="right"/>
+                                            </Card.Footer>
+                                        </Card>
+                                </Grid.Column>
+                                <Grid.Column width={3} mOrder={2} sOrder={2}>
+                                    <Card>
+                                        <Card.Header title="Add Rules"> <Icon name="badge-info"/></Card.Header>
+                                        <Card.Content>
+                                            <div style={{marginTop: '3em'}}></div>
+                                        </Card.Content>
+                                        <Card.Footer>
+                                            <Icon root="common" name="caret-right" className="right"/>
+                                        </Card.Footer>
+                                    </Card>
+                                </Grid.Column>
                             </Grid.Row>
-                            <Grid.Row>
-                                {items.map((item: any, index: any) => this.genCard(item, index))}
-                            </Grid.Row>
-                            <Grid.Row>
+                            {items.map((item: any, index: any) => this.genCard(item, index))}
+                            {/* <Grid.Row>
                                 {details.map((item: any) => this.genTable(item))}
-                            </Grid.Row>
+                            </Grid.Row> */}
                         </Grid>
                     </SidebarLayout.Content>
                 </SidebarLayout>
