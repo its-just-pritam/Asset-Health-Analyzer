@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import App from '../App';
 import { User, UserManager } from 'oidc-client';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { Icon } from "@scuf/common";
+import { Button, Card, Icon } from "@scuf/common";
  
 export const userManager = new UserManager({
     authority: 'https://forge-access-qa.dev.spec.honeywell.com/',
@@ -42,7 +42,7 @@ function useUser(userManager: UserManager): [User | undefined, boolean] {
     userManager.events.addUserLoaded(onUserLoaded);
     return () => userManager.events.removeUserLoaded(onUserLoaded);
   }, [userManager]);
-  console.log(user);
+  // console.log(user);
   return [user, isLoading];
 }
  
@@ -66,20 +66,22 @@ function makeAuthenticator<P extends object>({
     }
  
     if (user) {
-      console.log(user);
+      // console.log(user);
       return <WrappedComponent {...props} />;
     }
  
     return <PlaceholderComponent />;
   };
 }
- 
+
 // `makeAuthenticator` "protects" the App component by wrapping it in a component that validates that
 // the user has logged in first. While the user is logging in, the `placeholderComponent` is displayed
 const AppWithAuth = makeAuthenticator({
   userManager,
   PlaceholderComponent: () => <div style={{textAlign: 'center', paddingTop: '20em'}}>
-    Logging In...
+    <h2>
+      Logging In...
+    </h2>
     <Icon name="refresh" size="xlarge" loading={true}/>
   </div>,
   WrappedComponent: App,
@@ -100,7 +102,7 @@ const AuthRoutes = () => {
                 // Navigate user to home page
                 // TODO: figure out how to persist router state prior to login attempt
                 //       and restore it here
-                console.log(user);
+                // console.log(user);
                 routeProps.history.push('/');
               })
               .catch((err) => {
@@ -111,7 +113,9 @@ const AuthRoutes = () => {
  
             // This displays while `userManager.signinCallback()` is processing
             return <div style={{textAlign: 'center', paddingTop: '20em'}}>
-              SignInCallback() is processing...
+              <h2>
+                Redirecting to Home page...
+              </h2>
               <Icon name="refresh" size="xlarge" loading={true}/>
               </div>;
           }}
@@ -119,13 +123,23 @@ const AuthRoutes = () => {
         <Route
           path="/logout"
           render={(routeProps) => {
+            console.log('Logging Out');
             userManager.signoutCallback();
- 
+            
             // This displays once the user has logged out
             return (
-              <button onClick={() => routeProps.history.push('/')}>
-                Login
-              </button>
+              <div style={{textAlign: 'center'}}>
+                <Card>
+                  <Card.Content>
+                    <h1>
+                      Log In back to Asset Health Analyzer
+                    </h1>
+                    <Button onClick={() => routeProps.history.push('/')}>
+                      Login
+                    </Button>
+                  </Card.Content>
+                </Card>
+              </div>
             );
           }}
         />

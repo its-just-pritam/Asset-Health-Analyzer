@@ -7,10 +7,9 @@ import {
   SidebarLayout,
   Footer,
   Header,
-  Icon,
-  Carousel,
-  Button
+  Carousel
 } from "@scuf/common";
+import SubHeader from '../components/subheader'
 let home1 = require("../images/home1.jpg");
 let home2 = require("../images/home2.jpg");
 let home3 = require("../images/home3.jpg");
@@ -45,10 +44,7 @@ class Home extends React.Component<{}, { [key: string]: any }> {
           onMenuToggle={() => this.onCollapsedClick()}
           active={sidebarCollapsed}
         >
-          <Header.IconItem
-            icon={<Icon name="settings" root="common" />}
-            description="Settings"
-          />
+          <SubHeader />
         </Header>
         <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar">
           <SidebarLayout.Sidebar>
@@ -118,18 +114,6 @@ class Home extends React.Component<{}, { [key: string]: any }> {
                           provides alerts to the user for such detected anomalies.​"
                       />
                     </Carousel>
-                    </Card.Content>
-                  </Card>
-                  <Card>
-                    <Card.Content>
-                      <div style={{marginBottom: '2em'}}>
-                        <h1>
-                          Sign Out with Honeywell SSO
-                        </h1>
-                      </div>
-                      <Link to="/logout">
-                        <Button type="primary" content="Sign Out" />
-                      </Link>
                     </Card.Content>
                   </Card>
                   <div style={{marginBottom: '2em'}}></div>

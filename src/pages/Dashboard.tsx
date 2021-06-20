@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import '@scuf/common/honeywell-compact-dark/theme.css';
 import { Grid, Card, SidebarLayout, Footer, Header, Icon, Notification, Popup } from '@scuf/common';
 import { genChart, graph_data } from '../data';
+import SubHeader from '../components/subheader'
 
 class Dashboard extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
@@ -103,10 +104,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
         return (
             <section className="page-example-wrap">
                 <Header title="Asset Health Analyzer"  onMenuToggle={() => this.onCollapsedClick()} active={sidebarCollapsed}>
-                    <Header.Item href="#">
-                        <Icon size="large" root="building" name="user" />
-                    </Header.Item>
-                    <Header.IconItem icon={<Icon name="settings" root="common" />} description="Settings" />
+                    <SubHeader />
                 </Header>
                 <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar">
                 <SidebarLayout.Sidebar>

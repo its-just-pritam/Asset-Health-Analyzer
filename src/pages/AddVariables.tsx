@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '@scuf/common/honeywell-compact-dark/theme.css';
+import SubHeader from '../components/subheader'
 import { Grid, SidebarLayout, Footer, Header, Icon, Button, Breadcrumb, Select, Card } from '@scuf/common';
 
 class AddVariables extends React.Component<{}, { [key: string]: any}> {
@@ -30,10 +31,7 @@ class AddVariables extends React.Component<{}, { [key: string]: any}> {
         return (
             <section className="page-example-wrap new-test">
                 <Header title="Form Template"  onMenuToggle={() => this.onCollapsedClick()}>
-                    <Header.Item href="#">
-                        <Icon size="large" root="building" name="user"/>
-                    </Header.Item>
-                    <Header.IconItem icon={<Icon name="settings" root="common" />} description="Settings" />
+                    <SubHeader />
                 </Header>
                 <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar" >
                     <SidebarLayout.Sidebar>

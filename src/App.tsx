@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import AddVariables from './pages/AddVariables';
 import RemoveVariables from './pages/RemoveVariables';
 import SelectAssets from './pages/SelectAssets';
+import AuthRoutes from './routes';
 import Home from './pages/Home';
 // import AuthRoutes from './routes';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
@@ -30,7 +31,7 @@ function App() {
     <BrowserRouter>
       <Switch>
         <Route exact path="/" component={Home} />
-        {/* <Route path="/portal" component={AuthRoutes} /> */}
+        <Route path="/logout" component={AuthRoutes} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/select-assets" component={SelectAssets} />
         <Route path="/add-variables" component={AddVariables} />
