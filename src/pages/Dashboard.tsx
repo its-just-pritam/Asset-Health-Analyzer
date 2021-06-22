@@ -2,8 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '@scuf/common/honeywell-compact-dark/theme.css';
 import { Grid, Card, SidebarLayout, Footer, Header, Icon, Notification, Popup } from '@scuf/common';
-import { genChart, graph_data } from '../data';
 import SubHeader from '../components/subheader'
+import ChartComp from '../components/chartComp';
 
 class Dashboard extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
@@ -11,7 +11,6 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
         this.state = {
             sidebarCollapsed: false,
             settingsCollapsed: false,
-            graphData: graph_data,
             items: [
                 {name: 'Cold Storage', content: <div className="placeholder max-width" /> }, 
             ],
@@ -82,25 +81,9 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
             </Notification>
         )
     }
-
-    genChart(item: any, index: any){
-        return (
-            <Grid.Row>
-                <Grid.Column width={10} mWidth={12} key={index}>
-                    <Card>
-                        <Card.Header title={item.name}> <Icon name="settings"/></Card.Header>
-                        <Card.Content>
-                                {this.state.graphData.map((item: any) => genChart(item))}
-                            {item.content}
-                        </Card.Content>
-                    </Card>
-                </Grid.Column>
-            </Grid.Row>
-        )
-    }
     
     render() {
-        const { sidebarCollapsed, items, settingsCollapsed, Notif } = this.state;
+        const { sidebarCollapsed, settingsCollapsed, Notif } = this.state;
         return (
             <section className="page-example-wrap">
                 <Header title="Asset Health Analyzer"  onMenuToggle={() => this.onCollapsedClick()} active={sidebarCollapsed}>
@@ -213,7 +196,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                                     </div>
                                 </Grid.Column>
                             </Grid.Row>
-                            {items.map((item: any, index: any) => this.genChart(item, index))}
+                            <ChartComp />
                         </Grid>
                     </SidebarLayout.Content>
                 </SidebarLayout>

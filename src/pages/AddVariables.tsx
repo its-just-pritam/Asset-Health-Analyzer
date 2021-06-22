@@ -2,16 +2,18 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '@scuf/common/honeywell-compact-dark/theme.css';
 import SubHeader from '../components/subheader'
+import axios from "axios";
 import { Grid, SidebarLayout, Footer, Header, Icon, Button, Breadcrumb, Select, Card } from '@scuf/common';
 
 class AddVariables extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
         super(props);
         this.state = {
+            entries: [],
             varOptions: [ 
-                { value: 'Degree Celcius', text: 'Temperature' }, 
-                { value: 'Percentage', text:'Humidity' }, 
-                { value:'Atmosphere', text:'Pressure'}
+                { value: 'temperature', text: 'Temperature' }, 
+                { value: 'humidity', text:'Humidity' }, 
+                { value:'pressure', text:'Pressure'}
             ],
             sidebarCollapsed: false,
             settingsCollapsed: false,
@@ -26,11 +28,30 @@ class AddVariables extends React.Component<{}, { [key: string]: any}> {
         this.setState((prevState) => ({ settingsCollapsed: !prevState.settingsCollapsed }));
     }
 
+    async updateEntries(value: any) {
+        await this.setState(() => ({ entries: value }));
+        console.log(this.state.entries);
+    }
+
+    async sendParams()
+    {
+        this.state.entries.map(async (item: any) => {
+            const paramURL = `http://localhost:5000/setParamS/${item}`;
+
+            await axios.get(paramURL)
+            .then((res) => {
+                console.log(res);
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
     render() {
         const { sidebarCollapsed, settingsCollapsed, varOptions } = this.state;
         return (
             <section className="page-example-wrap new-test">
-                <Header title="Form Template"  onMenuToggle={() => this.onCollapsedClick()}>
+                <Header title="Asset Health Analyzer"  onMenuToggle={() => this.onCollapsedClick()}>
                     <SubHeader />
                 </Header>
                 <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar" >
@@ -97,7 +118,7 @@ class AddVariables extends React.Component<{}, { [key: string]: any}> {
                                                     </Grid.Row>                                                               
                                                     <Grid.Row>
                                                         <Grid.Column width={8}>
-                                                            <Select placeholder="Select Variables" options={varOptions} multiple={true} fluid={true} />
+                                                            <Select placeholder="Select Variables" options={varOptions} multiple={true} fluid={true} onChange = {(value: any) => this.updateEntries(value)} />
                                                         </Grid.Column>
                                                     </Grid.Row>
                                                     <Grid.Row>
@@ -105,7 +126,7 @@ class AddVariables extends React.Component<{}, { [key: string]: any}> {
                                                     </Grid.Row>
                                                     <Grid.Row>
                                                         <Grid.Column width={8}>
-                                                            <Button content="Add" />
+                                                            <Button content="Add" onClick={() => this.sendParams()} />
                                                         </Grid.Column>
                                                     </Grid.Row>  
                                                 </Grid>

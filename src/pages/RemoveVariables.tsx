@@ -13,15 +13,17 @@ import {
   Select,
   Card,
 } from "@scuf/common";
+import axios from "axios";
 
 class RemoveVariables extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
+      entries: [],
       varOptions: [
-        { value: "Degree Celcius", text: "Temperature" },
-        { value: "Percentage", text: "Humidity" },
-        { value: "Atmosphere", text: "Pressure" },
+        { value: "temperature", text: "Temperature" },
+        { value: "humidity", text: "Humidity" },
+        { value: "pressure", text: "Pressure" },
       ],
       sidebarCollapsed: false,
       settingsCollapsed: false,
@@ -40,12 +42,31 @@ class RemoveVariables extends React.Component<{}, { [key: string]: any }> {
     }));
   }
 
+  async updateEntries(value: any) {
+    await this.setState(() => ({ entries: value }));
+    console.log(this.state.entries);
+  }
+
+  async remParams()
+    {
+        this.state.entries.map(async (item: any) => {
+            const paramURL = `http://localhost:5000/remParamS/${item}`;
+
+            await axios.get(paramURL)
+            .then((res) => {
+                console.log(res);
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
   render() {
     const { sidebarCollapsed, settingsCollapsed, varOptions } = this.state;
     return (
       <section className="page-example-wrap new-test">
         <Header
-          title="Form Template"
+          title="Asset Health Analyzer"
           onMenuToggle={() => this.onCollapsedClick()}
         >
           <SubHeader />
@@ -138,6 +159,7 @@ class RemoveVariables extends React.Component<{}, { [key: string]: any }> {
                                   options={varOptions}
                                   multiple={true}
                                   fluid={true}
+                                  onChange = {(value: any) => this.updateEntries(value)}
                                 />
                               </Grid.Column>
                             </Grid.Row>
@@ -146,7 +168,7 @@ class RemoveVariables extends React.Component<{}, { [key: string]: any }> {
                             </Grid.Row>
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Button content="Remove" />
+                                <Button content="Remove" onClick={() => this.remParams()} />
                               </Grid.Column>
                             </Grid.Row>
                           </Grid>

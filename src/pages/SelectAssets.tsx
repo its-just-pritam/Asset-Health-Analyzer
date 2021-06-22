@@ -45,7 +45,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
     return (
       <section className="page-example-wrap new-test">
         <Header
-          title="Form Template"
+          title="Asset Health Analyzer"
           onMenuToggle={() => this.onCollapsedClick()}
         >
           <SubHeader />
