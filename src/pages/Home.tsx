@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "@scuf/common/honeywell-compact-dark/theme.css";
 import {
   Grid,
   Card,
@@ -9,7 +8,8 @@ import {
   Header,
   Carousel
 } from "@scuf/common";
-import SubHeader from '../components/subheader'
+import AppHeader from "../components/Header";
+import AppFooter from "../components/Footer";
 let home1 = require("../images/home1.jpg");
 let home2 = require("../images/home2.jpg");
 let home3 = require("../images/home3.jpg");
@@ -39,39 +39,7 @@ class Home extends React.Component<{}, { [key: string]: any }> {
     const { sidebarCollapsed, settingsCollapsed } = this.state;
     return (
       <section className="page-example-wrap">
-        <Header
-          title="Asset Health Analyzer"
-          onMenuToggle={() => this.onCollapsedClick()}
-          active={sidebarCollapsed}
-        >
-          <SubHeader />
-        </Header>
-        <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar">
-          <SidebarLayout.Sidebar>
-            <SidebarLayout.Sidebar.Item
-              content="Home"
-              active={true}
-              icon="home"
-            />
-            <Link to="/dashboard">
-              <SidebarLayout.Sidebar.Item content="Dashboard" icon="grid" />
-            </Link>
-            <SidebarLayout.Sidebar.BadgedItem
-              content="Notifications"
-              icon="notification"
-              badge="2"
-            />
-            <SidebarLayout.Sidebar.Submenu
-              content="Settings"
-              icon="settings"
-              open={settingsCollapsed}
-              onClick={() => this.onSettingsCollapsedClick()}
-            >
-              <SidebarLayout.Sidebar.Item content="Power" icon="battery-mid" />
-              <SidebarLayout.Sidebar.Item content="Time" icon="time" />
-            </SidebarLayout.Sidebar.Submenu>
-          </SidebarLayout.Sidebar>
-          <SidebarLayout.Content>
+           
             <Grid>
               <Grid.Row>
                     <Grid.Column width={10}>
@@ -120,13 +88,6 @@ class Home extends React.Component<{}, { [key: string]: any }> {
                 </Grid.Column>
               </Grid.Row>
             </Grid>
-          </SidebarLayout.Content>
-        </SidebarLayout>
-
-        <Footer>
-          <Footer.Item href="#">Terms & Conditions</Footer.Item>
-          <Footer.Item href="#">Privacy Policy</Footer.Item>
-        </Footer>
       </section>
     );
   }

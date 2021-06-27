@@ -1,9 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '@scuf/common/honeywell-compact-dark/theme.css';
-import SubHeader from '../components/subheader'
 import axios from "axios";
 import { Grid, SidebarLayout, Footer, Header, Icon, Button, Breadcrumb, Select, Card } from '@scuf/common';
+import AppHeader from '../components/Header';
 
 class AddVariables extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
@@ -51,9 +50,7 @@ class AddVariables extends React.Component<{}, { [key: string]: any}> {
         const { sidebarCollapsed, settingsCollapsed, varOptions } = this.state;
         return (
             <section className="page-example-wrap new-test">
-                <Header title="Asset Health Analyzer"  onMenuToggle={() => this.onCollapsedClick()}>
-                    <SubHeader />
-                </Header>
+                <AppHeader/>
                 <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar" >
                     <SidebarLayout.Sidebar>
                         <Link to="/">

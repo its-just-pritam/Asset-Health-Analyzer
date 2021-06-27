@@ -11,35 +11,49 @@ import {
   Select,
   Card,
 } from "@scuf/common";
-import AppHeader from "../components/Header";
+import { entries } from "mobx";
 
-class SelectAssets extends React.Component<{}, { [key: string]: any }> {
+class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
-      entry: {},
+      entries: {},
       varOptions: [
-        { value: 0, text: "---Select an Asset---" },
-        { value: 1, text: "Raspberry Pi" },
-        { value: 2, text: "Washing Machine" },
-        { value: 3, text: "Air Conditioner" },
-      ]
+        { value: "temperature", text: "Temperature" },
+        { value: "humidity", text: "Humidity" },
+      ],
+      sidebarCollapsed: false,
+      settingsCollapsed: false,
     };
+  }
+
+  onCollapsedClick() {
+    this.setState((prevState) => ({
+      sidebarCollapsed: !prevState.sidebarCollapsed,
+    }));
+  }
+
+  onSettingsCollapsedClick() {
+    this.setState((prevState) => ({
+      settingsCollapsed: !prevState.settingsCollapsed,
+    }));
   }
 
   async updateEntries(value: any) {
     let newVal = {
-      pointid: value
+      params: value
     };
-    await this.setState(() => ({ entry: newVal }));
-    console.log(this.state.entry);
+    await this.setState(() => ({ entries: newVal }));
+    console.log(this.state.entries);
   }
 
   async setParams()
   {
-    localStorage.setItem('assets', JSON.stringify(this.state.entry));
-    let assets = localStorage.getItem('assets');
-    console.log(JSON.parse(assets!));
+    localStorage.setItem('parameters', JSON.stringify(this.state.entries));
+
+    let params = localStorage.getItem('parameters');
+    console.log("Final params in storage:");
+    console.log(JSON.parse(params!));
     window.location.href = "/dashboard";
   }
 
@@ -65,7 +79,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                       </div>
                       <Link to="/dashboard">Dashboard</Link>
                     </Breadcrumb.Item>
-                    <Breadcrumb.Item>Select Asset</Breadcrumb.Item>
+                    <Breadcrumb.Item>Update Variables</Breadcrumb.Item>
                   </Breadcrumb>
                 </Grid.Column>
               </Grid.Row>
@@ -74,37 +88,42 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                   <Grid className="contact-us-area">
                     <Grid.Row>
                       <Grid.Column width={8}>
-                        <h1>Select Asset</h1>
+                        <h1>Update Variables</h1>
                       </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>
                       <Grid.Column width={8}>
-                        This form lets you select an asset under your holding whose 
-                        performance and reports are supposed to be viewed and analyzed on your
-                        customized dashboard. These assets are identified by pointID within the data
-                        received from the IoT devices. The various parameters and its values transmitted 
-                        by the IoT devices are filtered based on useful information, analyzed
-                        using Machine Learning Models and the resulting statistics are plotted
-                        on the charts.
+                        This form lets you enter multiple variable(s) which you want to
+                        include in the Dasboard as a parameter. You need to enter the appropiate 
+                        variable by making sure that such a parameter and it's values
+                        are valid and detected by your IoT devices. After submission of those details, 
+                        you can view the respective plots in the chart and perform suitable analysis.
+
+                        You can also enter the details of a variable that
+                        you want to remove from the Dasboard as a parameter that
+                        are already being displayed. After submission,
+                        you can view that it will be filtered out in our plots.
                       </Grid.Column>
                     </Grid.Row>
                     <Grid.Row>
                       <Card>
                         <Card.Content>
                           <Grid>
-                          <Grid.Row>
-                                <Grid.Column width={8}>
-                                    <h3 style={{marginTop: '1em'}}>Select an asset you want to analyse</h3>
-                                </Grid.Column>
+                            <Grid.Row>
+                              <Grid.Column width={8}>
+                                <h3 style={{ marginTop: "1em" }}>
+                                  Select the variables you want to remove
+                                </h3>
+                              </Grid.Column>
                             </Grid.Row>
+                            
                             <Grid.Row>
                               <Grid.Column width={8}>
                                 <Select
-                                  placeholder="Pick an Asset"
                                   options={varOptions}
-                                  multiple={false}
+                                  multiple={true}
                                   fluid={true}
-                                  defaultValue = {JSON.parse(localStorage.getItem('assets')!).pointid}
+                                  defaultValue = {JSON.parse(localStorage.getItem('parameters')!).params}
                                   onChange = {(value: any) => this.updateEntries(value)}
                                 />
                               </Grid.Column>
@@ -114,7 +133,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                             </Grid.Row>
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Button content="Lock" onClick={ () => this.setParams() } />
+                                <Button content="Update" onClick={ () => this.setParams() } />
                               </Grid.Column>
                             </Grid.Row>
                           </Grid>
@@ -130,4 +149,4 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
   }
 }
 
-export default SelectAssets;
+export default UpdateVariables;

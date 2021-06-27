@@ -1,25 +1,23 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '@scuf/common/honeywell-compact-dark/theme.css';
-import { Grid, Card, SidebarLayout, Footer, Header, Icon, Notification, Popup } from '@scuf/common';
-import SubHeader from '../components/subheader'
+import { Grid, Card, Icon, Notification, Popup, Badge } from '@scuf/common';
 import ChartComp from '../components/chartComp';
+import { getPrivateRoutesList } from '../components/PrivateRoutes/PrivateRouteConfig'
 
 class Dashboard extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
         super(props);
         this.state = {
-            sidebarCollapsed: false,
-            settingsCollapsed: false,
-            items: [
-                {name: 'Cold Storage', content: <div className="placeholder max-width" /> }, 
-            ],
+            colors: ["#E35F61", "#5E97EA", "#F3FFA1", "#FDB3F8", "#8CFF84"],
+            params: JSON.parse(localStorage.getItem('parameters')!).params || ["Select a variable!"],
+            assets : JSON.parse(localStorage.getItem('assets')!).pointid,
+            assetNames: ["---Select an Asset---", "Raspberry Pi", "Washing Machine", "Air Conditioner"],
+            routes: getPrivateRoutesList(),
             dashButtons: [
                 "Select an Asset to view it's performance on the Dashboard",
-                "Add Variables to view it's statistics on the Dashboard",
                 "Add an Event to receive notification on the Dashboard whenever it occurs",
                 "Display errors and anomalies detected during Asset analysis",
-                "Remove Variables to hide it's statistics on the Dashboard",
+                "Update Variables to filter the statistics on the Dashboard",
                 "Add appropiate rules to govern functionalities of Assets"
             ],
             Notif: [
@@ -46,14 +44,6 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
             ],
         }
     }
-    
-    onCollapsedClick() {
-        this.setState((prevState) => ({ sidebarCollapsed: !prevState.sidebarCollapsed }));
-    }
-
-    onSettingsCollapsedClick() {
-        this.setState((prevState) => ({ settingsCollapsed: !prevState.settingsCollapsed }));
-    }
 
     genInfo(pos: any){
         return(
@@ -70,6 +60,36 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
         )
     }
 
+    showParameters(item: any, index: any) {
+        
+        return (
+            <div style={{color: this.state.colors[index]}}>
+                {item.charAt(0).toUpperCase() + item.slice(1)}<br/><br/>
+            </div>
+        )
+    }
+
+    showAltParam() {
+
+        if( JSON.parse(localStorage.getItem('parameters')!).params === undefined ) return(<></>);
+        if( JSON.parse(localStorage.getItem('parameters')!).params[0] === undefined )
+            return (
+                <div style={{color: "#E35F61"}}>
+                    Select a variable!
+                </div>
+            )
+        else return(<></>);
+    }
+
+    showAsset() {
+        let name = this.state.assetNames[this.state.assets];
+        return (
+            <div>
+                {name.charAt(0).toUpperCase() + name.slice(1)}<br/><br/>
+            </div>
+        )
+    }
+
     genNotif(item: any) {
         return (
             <Notification
@@ -83,30 +103,9 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
     }
     
     render() {
-        const { sidebarCollapsed, settingsCollapsed, Notif } = this.state;
+        const { routes, Notif, params } = this.state;
         return (
             <section className="page-example-wrap">
-                <Header title="Asset Health Analyzer"  onMenuToggle={() => this.onCollapsedClick()} active={sidebarCollapsed}>
-                    <SubHeader />
-                </Header>
-                <SidebarLayout collapsed={sidebarCollapsed} className="example-sidebar">
-                <SidebarLayout.Sidebar>
-                        <Link to="/">
-                            <SidebarLayout.Sidebar.Item content="Home" icon="home" />
-                        </Link>
-                        <SidebarLayout.Sidebar.Item content="Dashboard" active={true} icon="grid"/>
-                        <SidebarLayout.Sidebar.BadgedItem content="Notifications" icon="notification" badge="2" />
-                        <SidebarLayout.Sidebar.Submenu
-                            content="Settings"
-                            icon="settings" 
-                            open={settingsCollapsed}  
-                            onClick={() => this.onSettingsCollapsedClick()}
-                        >
-                            <SidebarLayout.Sidebar.Item content="Power" icon="battery-mid" />
-                            <SidebarLayout.Sidebar.Item content="Time" icon="time" />
-                        </SidebarLayout.Sidebar.Submenu>
-                    </SidebarLayout.Sidebar>
-                    <SidebarLayout.Content>
                         <Grid>
                             <Grid.Row>
                                 <Grid.Column width={10}>
@@ -115,34 +114,24 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column width={4} mOrder={3} sOrder={1} >
-                                    <Card>
-                                    <Card.Header title='Select Asset'> {this.genInfo(0)} </Card.Header>
+                                    <Card style={{height: "300px"}}>
+                                    <Card.Header title={routes[2].name}> {this.genInfo(0)} </Card.Header>
                                         <Card.Content>
                                             <div style={{marginTop: '3em'}}></div>
+                                            <h2>
+                                                {this.showAsset()}
+                                            </h2>
                                         </Card.Content>
-                                        <Link to="/select-assets">
+                                        <Link to={routes[2].path}>
                                             <Card.Footer>
                                                 <Icon root="common" name="caret-right" className="right"/>
                                             </Card.Footer>
                                         </Link>
                                     </Card>
                                 </Grid.Column>
-                                <Grid.Column width={3} mOrder={1} sOrder={3}>
-                                    <Card>
-                                        <Card.Header title='Add Variables'> {this.genInfo(1)} </Card.Header>
-                                        <Card.Content>
-                                            <div style={{marginTop: '3em'}}></div>
-                                        </Card.Content>
-                                        <Link to="/add-variables">
-                                            <Card.Footer>
-                                                <Icon root="common" name="caret-right" className="right"/>
-                                            </Card.Footer>
-                                        </Link>
-                                    </Card>
-                                </Grid.Column>
-                                <Grid.Column width={3} mOrder={1} sOrder={3}>
-                                    <Card>
-                                        <Card.Header title='Add Events'> {this.genInfo(2)} </Card.Header>
+                                <Grid.Column width={6} mOrder={1} sOrder={3}>
+                                    <Card style={{height: "300px"}}>
+                                        <Card.Header title='Add Events'> {this.genInfo(1)} </Card.Header>
                                         <Card.Content>
                                             <div style={{marginTop: '3em'}}></div>
                                         </Card.Content>
@@ -154,8 +143,8 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                             </Grid.Row>
                             <Grid.Row>
                                 <Grid.Column width={4} mOrder={2} sOrder={2}>
-                                    <Card>
-                                        <Card.Header title="Show Faults"> {this.genInfo(3)} </Card.Header>
+                                    <Card style={{height: "300px"}}>
+                                        <Card.Header title="Show Faults"> {this.genInfo(2)} </Card.Header>
                                         <Card.Content>
                                             <div style={{marginTop: '3em'}}></div>
                                         </Card.Content>
@@ -165,12 +154,16 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                                     </Card>
                                 </Grid.Column>
                                 <Grid.Column width={3} mOrder={2} sOrder={2}>
-                                    <Card>
-                                        <Card.Header title="Remove Variables"> {this.genInfo(4)} </Card.Header>
+                                    <Card style={{height: "300px"}}>
+                                        <Card.Header title={routes[5].name}> {this.genInfo(3)} </Card.Header>
                                         <Card.Content>
                                             <div style={{marginTop: '3em'}}></div>
+                                            <h4>
+                                                {params.map((item: any, index: any) => this.showParameters(item, index))}
+                                                {this.showAltParam()}
+                                            </h4>
                                         </Card.Content>
-                                        <Link to="/remove-variables">
+                                        <Link to={routes[5].path}>
                                         <Card.Footer>
                                             <Icon root="common" name="caret-right" className="right"/>
                                         </Card.Footer>
@@ -178,8 +171,8 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                                     </Card>
                                 </Grid.Column>
                                 <Grid.Column width={3} mOrder={2} sOrder={2}>
-                                    <Card>
-                                        <Card.Header title="Add Rules"> {this.genInfo(5)} </Card.Header>
+                                    <Card style={{height: "300px"}}>
+                                        <Card.Header title="Add Rules"> {this.genInfo(4)} </Card.Header>
                                         <Card.Content>
                                             <div style={{marginTop: '3em'}}></div>
                                         </Card.Content>
@@ -189,21 +182,15 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                                     </Card>
                                 </Grid.Column>
                             </Grid.Row>
-                            <Grid.Row>
+                            {/* <Grid.Row>
                                 <Grid.Column width={10} mWidth={10}>
                                     <div>
                                         {Notif.map((item: any) => this.genNotif(item))}
                                     </div>
                                 </Grid.Column>
-                            </Grid.Row>
+                            </Grid.Row> */}
                             <ChartComp />
                         </Grid>
-                    </SidebarLayout.Content>
-                </SidebarLayout>
-                <Footer>
-                    <Footer.Item href="#">Terms & Conditions</Footer.Item>
-                    <Footer.Item href="#">Privacy Policy</Footer.Item>    
-                </Footer>
             </section>
         )
     }

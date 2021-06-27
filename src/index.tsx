@@ -1,18 +1,15 @@
+import Routes from './routes'
+import { authConfig } from './UserManagerConfig'
+import '@scuf/datatable/honeywell-compact-combined/theme.css'
+import '@scuf/common/honeywell-compact-combined/theme.css'
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 // import App from './App';
 import reportWebVitals from './reportWebVitals';
 import AuthRoutes from './routes';
+import { UserManager } from '@forge/sso-client/dist';
+UserManager.createInstance(authConfig)
+ReactDOM.render(<Routes />, document.querySelector('#root') as HTMLElement)
 
-ReactDOM.render(
-  <React.StrictMode>
-    <AuthRoutes />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
