@@ -12,6 +12,7 @@ import {
   Card,
 } from "@scuf/common";
 import { entries } from "mobx";
+import { storageDataParams } from "../components/storage";
 
 class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
@@ -40,8 +41,11 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
   }
 
   async updateEntries(value: any) {
+    let tempVal = value.filter(function(value: any, index: any, arr: any){ 
+      return value !== "Select a variable!";
+  });
     let newVal = {
-      params: value
+      params: tempVal
     };
     await this.setState(() => ({ entries: newVal }));
     console.log(this.state.entries);
@@ -54,6 +58,7 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
     let params = localStorage.getItem('parameters');
     console.log("Final params in storage:");
     console.log(JSON.parse(params!));
+    console.log(JSON.parse(params!).params);
     window.location.href = "/dashboard";
   }
 
@@ -123,7 +128,7 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
                                   options={varOptions}
                                   multiple={true}
                                   fluid={true}
-                                  defaultValue = {JSON.parse(localStorage.getItem('parameters')!).params}
+                                  defaultValue = {storageDataParams()}
                                   onChange = {(value: any) => this.updateEntries(value)}
                                 />
                               </Grid.Column>

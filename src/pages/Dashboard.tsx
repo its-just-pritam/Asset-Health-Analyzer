@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom';
 import { Grid, Card, Icon, Notification, Popup, Badge } from '@scuf/common';
 import ChartComp from '../components/chartComp';
 import { getPrivateRoutesList } from '../components/PrivateRoutes/PrivateRouteConfig'
+import { storageDataAssets, storageDataParams } from '../components/storage';
 
 class Dashboard extends React.Component<{}, { [key: string]: any}> {
     constructor(props: any) {
         super(props);
         this.state = {
             colors: ["#E35F61", "#5E97EA", "#F3FFA1", "#FDB3F8", "#8CFF84"],
-            params: JSON.parse(localStorage.getItem('parameters')!).params || ["Select a variable!"],
-            assets : JSON.parse(localStorage.getItem('assets')!).pointid,
+            params: storageDataParams(),
+            assets : storageDataAssets(),
             assetNames: ["---Select an Asset---", "Raspberry Pi", "Washing Machine", "Air Conditioner"],
             routes: getPrivateRoutesList(),
             dashButtons: [
@@ -43,6 +44,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                 },
             ],
         }
+        console.log(this.state.params);
     }
 
     genInfo(pos: any){
@@ -69,20 +71,21 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
         )
     }
 
-    showAltParam() {
+    // showAltParam() {
 
-        if( JSON.parse(localStorage.getItem('parameters')!).params === undefined ) return(<></>);
-        if( JSON.parse(localStorage.getItem('parameters')!).params[0] === undefined )
-            return (
-                <div style={{color: "#E35F61"}}>
-                    Select a variable!
-                </div>
-            )
-        else return(<></>);
-    }
+    //     if( JSON.parse(localStorage.getItem('parameters')!).params === undefined ) return(<></>);
+    //     if( JSON.parse(localStorage.getItem('parameters')!).params[0] === undefined )
+    //         return (
+    //             <div style={{color: "#E35F61"}}>
+    //                 Select a variable!
+    //             </div>
+    //         )
+    //     else return(<></>);
+    // }
 
     showAsset() {
         let name = this.state.assetNames[this.state.assets];
+        console.log(this.state.assets);
         return (
             <div>
                 {name.charAt(0).toUpperCase() + name.slice(1)}<br/><br/>
@@ -103,7 +106,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
     }
     
     render() {
-        const { routes, Notif, params } = this.state;
+        const { routes, Notif, params, assets } = this.state;
         return (
             <section className="page-example-wrap">
                         <Grid>
@@ -160,7 +163,6 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                                             <div style={{marginTop: '3em'}}></div>
                                             <h4>
                                                 {params.map((item: any, index: any) => this.showParameters(item, index))}
-                                                {this.showAltParam()}
                                             </h4>
                                         </Card.Content>
                                         <Link to={routes[5].path}>

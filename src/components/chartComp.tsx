@@ -3,13 +3,12 @@ import { Grid, Card, Icon, DatePicker, Button } from "@scuf/common";
 import axios from "axios";
 import { useState } from "react";
 import React, {Component} from 'react';
+import { storageDataParams } from "./storage";
 
 export default function ChartComp() {
 
-    // eslint-disable-next-line
-    let params = JSON.parse(localStorage.getItem('parameters')!).params || ["Select a variable!"];
-    if( params[0] === undefined )
-        params = ["Select a variable!"];
+    // eslint-disable-next-lines
+    let params = storageDataParams();
     const colors = ["#E35F61", "#5E97EA", "#F3FFA1", "FDB3F8", "8CFF84"];
     const [value, setValue] = useState([]);
     const [date, setDate] = useState(new Date());

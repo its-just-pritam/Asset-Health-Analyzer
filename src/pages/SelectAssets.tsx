@@ -2,16 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   Grid,
-  SidebarLayout,
-  Footer,
-  Header,
   Icon,
   Button,
   Breadcrumb,
   Select,
   Card,
 } from "@scuf/common";
-import AppHeader from "../components/Header";
+import { storageDataAssets } from "../components/storage";
 
 class SelectAssets extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
@@ -35,7 +32,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
     console.log(this.state.entry);
   }
 
-  async setParams()
+  async setAssets()
   {
     localStorage.setItem('assets', JSON.stringify(this.state.entry));
     let assets = localStorage.getItem('assets');
@@ -104,7 +101,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                                   options={varOptions}
                                   multiple={false}
                                   fluid={true}
-                                  defaultValue = {JSON.parse(localStorage.getItem('assets')!).pointid}
+                                  defaultValue = {storageDataAssets()}
                                   onChange = {(value: any) => this.updateEntries(value)}
                                 />
                               </Grid.Column>
@@ -114,7 +111,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                             </Grid.Row>
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Button content="Lock" onClick={ () => this.setParams() } />
+                                <Button content="Lock" onClick={ () => this.setAssets() } />
                               </Grid.Column>
                             </Grid.Row>
                           </Grid>
