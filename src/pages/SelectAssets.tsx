@@ -16,20 +16,22 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
     this.state = {
       entry: {},
       varOptions: [{
-        "value": 0,
-        "text": "---Select an Asset---"
+        "value": "---Select an Asset---",
+        "text": "---Select an Asset---",
+        "point": 0
     }]
     };
   }
 
   async componentDidMount() {
     let ops = await getPointsData();
-    let newOps: { value: string; text: string; }[] = [];
+    let newOps: { value: string; text: string; point: number }[] = [];
 
     for( let i in ops ) {
       let elem = {
-        value: ops[i].text,
-        text: ops[i].text
+        value: ops[i].dev,
+        text: ops[i].dev,
+        point: ops[i].point
       };
       // console.log(elem);
       newOps.push(elem);
@@ -44,8 +46,17 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
   }
 
   async updateEntries(value: any) {
+
+    let pointID;
+    this.state.varOptions.map((item: any) => {
+      if( item.value === value )
+        pointID = item.point;
+      return 0;
+    });
+
     let newVal = {
-      devid: value
+      devid: value,
+      pointid: pointID
     };
     await this.setState(() => ({ entry: newVal }));
     console.log(this.state.entry);

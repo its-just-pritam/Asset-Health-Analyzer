@@ -1,19 +1,62 @@
 import { TimeSeries } from "@scuf/charts";
 import { Grid, Card, Icon, DatePicker, Button } from "@scuf/common";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React, {Component} from 'react';
-import { storageDataParams } from "./storage";
+import { getChartsData, storageDataParams } from "./storage";
 
 export default function ChartComp() {
 
     // eslint-disable-next-lines
     let params = storageDataParams();
     const colors = ["#E35F61", "#5E97EA", "#F3FFA1", "FDB3F8", "8CFF84"];
-    const [value, setValue] = useState([]);
-    const [date, setDate] = useState(new Date());
-
+    const [date, setDateTime] = useState(new Date());
     const [data, setData] = useState([[0]]);
+
+    useEffect(() => {
+
+        async function InsideEffect() {
+
+            const start = new Date(date);
+            const end = new Date(date);
+            await end.setDate(end.getDate()+1);
+            // await console.log(start.getDate() + " " + end.getDate());
+
+            let APIdata = await getChartsData(start, end);
+            console.log(APIdata);
+
+            let chartData = await handleAPI(APIdata);
+            console.log(chartData);
+            await setData(chartData);
+        }
+
+        InsideEffect();
+
+    }, [date]);
+
+    async function handleAPI(APIata: any) {
+        
+        let newData = [];
+
+        for( let i in params )
+        {
+            let elem;
+            try {
+                switch(params[i]) 
+                {
+                    case "temperature" : elem = APIata.map((item: any) => [Date.parse(item.EventEnqueuedUtcTime), item.temperature]); break;
+                    case "humidity" : elem = APIata.map((item: any) => [Date.parse(item.EventEnqueuedUtcTime), item.humidity]); break;
+                }
+            } catch(e) {
+                console.log("Invalid json file received!");
+            }
+
+            await newData.push(elem);
+        }
+        
+        return newData;
+
+    }
 
     function showChart(item: any, index: any) {
         return (
@@ -24,25 +67,10 @@ export default function ChartComp() {
         );
     }
 
-    async function updateDate(date: any) {
+    async function updateDate(temp_date: any) {
         // Date to be updated here
+        await setDateTime(temp_date);
     }
-
-    async function updateData(date: any) {
-        let newValue = await APIcallGraph(date);
-        await setValue(newValue!);
-
-        return newValue;
-    }
-
-    async function displayChart() {
-        let newValue = await updateData(date);
-
-        let newData = await ImportChartData(newValue, params);
-        await setData(newData!);
-    }
-
-    // console.log(value);
 
     return (
         <Grid.Row>
@@ -53,64 +81,13 @@ export default function ChartComp() {
                         <div style={{margin: "1em 0 0.5em 0"}} >
                             <DatePicker label="Pick a date" value={new Date()} onChange={async (date) => await updateDate(date)} />
                         </div>
-                        <div style={{margin: "0 0 2em 0"}} >
+                        {/* <div style={{margin: "0 0 2em 0"}} >
                             <Button content="Refresh Chart" onClick={() => displayChart()} />
-                        </div>
+                        </div> */}
                         {data.map((item: any, index: any) => showChart(item, index))}
                     </Card.Content>
                 </Card>
             </Grid.Column>
         </Grid.Row>
     );
-}
-
-async function ImportChartData(value: any, params: any) {
-
-    console.log(value);
-    let newData = [];
-    // console.log(params);
-
-    for( let i in params )
-    {
-        let elem = [];
-        try {
-            switch(params[i]) 
-            {
-                case "temperature" : elem = await value.map((item: any) => [Date.parse(item.EventEnqueuedUtcTime), item.temperature]); break;
-                case "humidity" : elem = await value.map((item: any) => [Date.parse(item.EventEnqueuedUtcTime), item.humidity]); break;
-            }
-        } catch(e) {
-            console.log("Invalid json file received!");
-        }
-
-        newData.push(elem);
-        // console.log(elem);
-    }
-    
-    console.log(newData);
-    
-    return newData;
-}
-
-async function APIcallGraph(value: any) {
-
-    let returnData;
-    let pointID = 1;
-    let start = "June 21 2021 16:44:00";
-    let end = "June 21 2021 16:46:00"
-    
-    const URL = `http://localhost:5000/getData/charts?jobid=h442163`;
-    const dataURL = `https://forge-asset-health-analyzer-oc-api-yjlckngn-dev.apps.dev.aro.forgeapp.honeywell.com/api/events?pointId=${pointID}&start=${start}&end=${end}`;
-
-    await axios.get(URL)
-    .then((res) => {
-        console.log(res.data);
-        returnData = res.data;
-    }).catch((err) => {
-        console.log(err);
-        returnData = [];
-    });
-
-    return returnData;
-
 }

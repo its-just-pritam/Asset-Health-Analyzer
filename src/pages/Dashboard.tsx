@@ -12,7 +12,6 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
             colors: ["#E35F61", "#5E97EA", "#F3FFA1", "#FDB3F8", "#8CFF84"],
             params: storageDataParams(),
             assets : storageDataAssets(),
-            assetNames: ["---Select an Asset---", "Raspberry Pi", "Washing Machine", "Air Conditioner"],
             routes: getPrivateRoutesList(),
             dashButtons: [
                 "Select an Asset to view it's performance on the Dashboard",
@@ -20,29 +19,7 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
                 "Display errors and anomalies detected during Asset analysis",
                 "Update Variables to filter the statistics on the Dashboard",
                 "Add appropiate rules to govern functionalities of Assets"
-            ],
-            Notif: [
-                {   title: "Critical Pump Failure", 
-                    tags: ['Refinery', 'Pump'], 
-                    severity: "critical", 
-                    details: "Excessive pump vibration caused by a failing metal frame.",
-                },
-                {   title: "Freight XYZ-123, to be updated", 
-                    tags: ['Refinery', 'Pump'], 
-                    severity: "important", 
-                    details: "Freight reached its destination (Atlanta Midtown).",
-                },
-                {   title: "Critical Pump Failure", 
-                    tags: ['Bombadier', 'Challenger 300', 'ATA 49', 'Auxiliary Power Unit'], 
-                    severity: "information", 
-                    details: "Auxiliary Power Unit replacement is due in next 30 days.",
-                },
-                {   title: "Everything is Fine", 
-                    tags: ['Bombadier', 'Challenger 300', 'ATA 49', 'Auxiliary Power Unit'], 
-                    severity: "success", 
-                    details: "Building is running optimal power consumption.",
-                },
-            ],
+            ]
         }
         console.log(this.state.params);
     }
