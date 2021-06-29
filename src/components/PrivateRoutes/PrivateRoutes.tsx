@@ -2,8 +2,6 @@ import { Loader } from '@scuf/common'
 import { observer } from 'mobx-react'
 import React, { FC, Suspense } from 'react'
 import { Route, Switch } from 'react-router-dom'
-// import { NotFoundPage } from '../../pages/NotFound/NotFound'
-import stores from '../../Store'
 import { getPrivateRoutesList } from './PrivateRouteConfig'
 const Routes: FC = observer(() => {
  const routes = getPrivateRoutesList()

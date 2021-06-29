@@ -2,6 +2,7 @@ import Home from "../../pages/Home"
 import Dashboard from "../../pages/Dashboard"
 import UpdateVariables from "../../pages/UpdateVariables"
 import SelectAssets from "../../pages/SelectAssets"
+import ClientProfile from "../../pages/ClientProfile"
 
 export const getPrivateRoutesList = () => {
     return[
@@ -53,6 +54,13 @@ export const getPrivateRoutesList = () => {
             component:UpdateVariables,
             icon:"",
             position: "dashboard"
+        },
+        {
+            name:"Profile",
+            path:"/client-profile",
+            component:ClientProfile,
+            icon:"user",
+            position: "sidebar"
         }
     ]
 }

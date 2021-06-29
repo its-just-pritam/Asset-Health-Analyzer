@@ -4,6 +4,7 @@ import UserProfile from '@scuf/common/dist/components/Header/UserProfile/UserPro
 import { observer } from 'mobx-react'
 import React from 'react'
 import { useHistory } from 'react-router'
+import { Link } from 'react-router-dom'
 import stores from '../Store'
 export const AppHeader = observer(() => {
  const { globalStore } = stores
@@ -25,15 +26,18 @@ export const AppHeader = observer(() => {
  onTitleClick={() => push('/')}
  >
  <UserProfile firstName={user?.profile.given_name || ''} lastName={user?.profile.family_name}>
- <UserProfile.Item>
- <Checkbox
- label={'Dark Mode'}
- checked={globalStore.darkMode}
- onChange={() => globalStore.toggleDarkMode(!globalStore.darkMode)}
- toggle={true}
- />
- </UserProfile.Item>
- <UserProfile.Item onClick={() => userManager.signoutRedirect()}>Logout</UserProfile.Item>
+    <UserProfile.Item>
+        <Checkbox
+        label={'Dark Mode'}
+        checked={globalStore.darkMode}
+        onChange={() => globalStore.toggleDarkMode(!globalStore.darkMode)}
+        toggle={true}
+        />
+    </UserProfile.Item>
+    <UserProfile.Item onClick={() =>push('/client-profile')}>
+            Profile
+    </UserProfile.Item>
+    <UserProfile.Item onClick={() => userManager.signoutRedirect()}>Logout</UserProfile.Item>
  </UserProfile>
  </Header>
  )

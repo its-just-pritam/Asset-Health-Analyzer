@@ -8,25 +8,44 @@ import {
   Select,
   Card,
 } from "@scuf/common";
-import { storageDataAssets } from "../components/storage";
+import { getPointsData, storageDataAssets } from "../components/storage";
 
 class SelectAssets extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
       entry: {},
-      varOptions: [
-        { value: 0, text: "---Select an Asset---" },
-        { value: 1, text: "Raspberry Pi" },
-        { value: 2, text: "Washing Machine" },
-        { value: 3, text: "Air Conditioner" },
-      ]
+      varOptions: [{
+        "value": 0,
+        "text": "---Select an Asset---"
+    }]
     };
+  }
+
+  async componentDidMount() {
+    let ops = await getPointsData();
+    let newOps: { value: string; text: string; }[] = [];
+
+    for( let i in ops ) {
+      let elem = {
+        value: ops[i].text,
+        text: ops[i].text
+      };
+      // console.log(elem);
+      newOps.push(elem);
+    }
+    await this.setState(() => ({ varOptions: newOps }));
+    console.log(this.state.varOptions);
+  }
+
+  async loadOptions(Callback: any) {
+    let ops = await Callback();
+    return ops;
   }
 
   async updateEntries(value: any) {
     let newVal = {
-      pointid: value
+      devid: value
     };
     await this.setState(() => ({ entry: newVal }));
     console.log(this.state.entry);

@@ -2,44 +2,39 @@ import React from "react";
 import { Link } from "react-router-dom";
 import {
   Grid,
-  SidebarLayout,
-  Footer,
-  Header,
   Icon,
   Button,
   Breadcrumb,
   Select,
   Card,
 } from "@scuf/common";
-import { entries } from "mobx";
-import { storageDataParams } from "../components/storage";
+import { getParamsData, storageDataParams } from "../components/storage";
 
 class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
       entries: {},
-      varOptions: [
-        { value: "temperature", text: "Temperature" },
-        { value: "humidity", text: "Humidity" },
-      ],
-      sidebarCollapsed: false,
-      settingsCollapsed: false,
+      varOptions: []
     };
   }
 
-  onCollapsedClick() {
-    this.setState((prevState) => ({
-      sidebarCollapsed: !prevState.sidebarCollapsed,
-    }));
-  }
+  async componentDidMount() {
+    let ops = await getParamsData();
+    let newOps: { value: string; text: string; }[] = [];
 
-  onSettingsCollapsedClick() {
-    this.setState((prevState) => ({
-      settingsCollapsed: !prevState.settingsCollapsed,
-    }));
+    for( let i in ops ) {
+      let elem = {
+        value: ops[i],
+        text: ops[i].charAt(0).toUpperCase() + ops[i].slice(1)
+      };
+      // console.log(elem);
+      newOps.push(elem);
+    }
+    await this.setState(() => ({ varOptions: newOps }));
+    console.log(this.state.varOptions);
   }
-
+  
   async updateEntries(value: any) {
     let tempVal = value.filter(function(value: any, index: any, arr: any){ 
       return value !== "Select a variable!";
@@ -117,7 +112,7 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
                             <Grid.Row>
                               <Grid.Column width={8}>
                                 <h3 style={{ marginTop: "1em" }}>
-                                  Select the variables you want to remove
+                                  Select the variables you want to update
                                 </h3>
                               </Grid.Column>
                             </Grid.Row>

@@ -84,11 +84,11 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
     // }
 
     showAsset() {
-        let name = this.state.assetNames[this.state.assets];
+        let name = this.state.assets;
         console.log(this.state.assets);
         return (
             <div>
-                {name.charAt(0).toUpperCase() + name.slice(1)}<br/><br/>
+                {name}<br/><br/>
             </div>
         )
     }
