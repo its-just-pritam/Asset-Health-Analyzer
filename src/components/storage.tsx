@@ -13,6 +13,33 @@ export const storageDataParams = () => {
     }
 };
 
+const convertArrayToObject = (array: any) => {
+    const initialValue = {};
+    return array.reduce((obj: any, item: any) => {
+      return {
+        ...obj,
+        [item]: [null, null],
+      };
+    }, initialValue);
+};
+
+export const storageDataRules = () => {
+
+    let dummyParams = storageDataParams();
+    let dummyLimits = convertArrayToObject(dummyParams);
+
+    if( JSON.parse(localStorage.getItem('rules')!) === ( undefined || null ) ) {
+        return dummyLimits;
+    } else if(JSON.parse(localStorage.getItem('rules')!).limits === undefined ) {
+        return dummyLimits;
+    } else if(JSON.parse(localStorage.getItem('rules')!).limits[`${dummyParams[0]}`] === undefined ) {
+        return dummyLimits;
+    }
+     else {
+        return JSON.parse(localStorage.getItem('rules')!).limits;
+    }
+};
+
 export const storageDataAssets = () => {
     if( JSON.parse(localStorage.getItem('assets')!) === ( undefined || null )) {
         return "---Select an Asset---";
@@ -33,20 +60,17 @@ export const storageDataAssetPoints = () => {
     }
 };
 
-export const getPointsData = async () => {
+export const getPointsData = async (token: any) => {
 
     let returnData = [{
             "dev": "---Select an Asset---",
             "point": 0
         }];
     const URL = `https://forge-asset-health-analyzer-oc-api-yjlckngn-dev.apps.dev.aro.forgeapp.honeywell.com/api/points`;
-    const token = localStorage.getItem('access_token');
 
     await axios.get(URL, {
         headers: {
             Authorization: 'Bearer ' + token,
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         }
     })
     .then(async (res) => {
@@ -61,7 +85,7 @@ export const getPointsData = async () => {
             "dev": "---Select an Asset---",
             "point": 0
         });
-        console.log(returnData);
+        // console.log(returnData);
     }).catch((err) => {
         console.log(err);
     });
@@ -70,18 +94,15 @@ export const getPointsData = async () => {
     
 };
 
-export const getParamsData = async () => {
+export const getParamsData = async (token: any) => {
 
     let returnData: string[] = [];
 
     const URL = `https://forge-asset-health-analyzer-oc-api-yjlckngn-dev.apps.dev.aro.forgeapp.honeywell.com/api/metadata?deviceId=${storageDataAssets()}`;
-    const token = localStorage.getItem('access_token');
-
+    
     await axios.get(URL, {
         headers: {
             Authorization: 'Bearer ' + token,
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
         }
     })
     .then(async (res) => {
@@ -94,23 +115,45 @@ export const getParamsData = async () => {
     return returnData;
 }
 
-export const getChartsData = async (start: any, end: any) => {
+export const getChartsData = async (start: Date, end: Date, token: any) => {
 
     let returnData: any[] = [];
     const pointID = storageDataAssetPoints();
 
-    const beg = await start.toISOString().split('T')[0];
-    const fin = await end.toISOString().split('T')[0];
+    const beg = start.toUTCString();
+    const fin = end.toUTCString();
+
     await console.log(beg + " " + fin);
 
     const URL = `https://forge-asset-health-analyzer-oc-api-yjlckngn-dev.apps.dev.aro.forgeapp.honeywell.com/api/events?pointId=${pointID}&start=${beg}&end=${fin}`;
-    const token = localStorage.getItem('access_token');
 
     await axios.get(URL, {
         headers: {
             Authorization: 'Bearer ' + token,
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Methods' : 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+        }
+    })
+    .then(async (res) => {
+        console.log(res.data);
+        returnData = res.data;
+    }).catch((err) => {
+        console.log(err);
+    });
+
+    return returnData;
+}
+
+export const getPredictionData = async (token: any, count: any) => {
+
+    let returnData = null;
+    const pointID = storageDataAssetPoints();
+    const variables = storageDataParams();
+    const URLvariables = variables.map((item: any) => `&properties=${item}`);
+
+    const URL = `https://forge-asset-health-analyzer-oc-api-yjlckngn-dev.apps.dev.aro.forgeapp.honeywell.com/api/predict?pointId=${pointID}&count=${count}${URLvariables.join('')}`;
+
+    await axios.get(URL, {
+        headers: {
+            Authorization: 'Bearer ' + token,
         }
     })
     .then(async (res) => {

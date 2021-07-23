@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
   Grid,
   Icon,
@@ -9,18 +9,38 @@ import {
   Card,
 } from "@scuf/common";
 import { getParamsData, storageDataParams } from "../components/storage";
+import { useSSOClient } from "@forge/sso-client/dist";
 
-class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
+export default function UpdateVariables(props: any) {
+
+  const { user } = useSSOClient();
+  const token = user?.access_token!;
+
+  if(user === null || ( new Date(1000 * (user.expires_at)) <= new Date() ))
+    return (
+      <Redirect to={{ pathname: "/login" }} />
+    );
+  else
+    return (
+      <UpdateVariablesClass token={token} />
+    );
+}
+
+class UpdateVariablesClass extends React.Component<{ [key: string]: any }, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
+      isLoading: true,
+      token: this.props.token,
+      disabledButton: true,
       entries: {},
       varOptions: []
     };
   }
 
   async componentDidMount() {
-    let ops = await getParamsData();
+
+    let ops = await getParamsData(this.state.token);
     let newOps: { value: string; text: string; }[] = [];
 
     for( let i in ops ) {
@@ -32,10 +52,13 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
       newOps.push(elem);
     }
     await this.setState(() => ({ varOptions: newOps }));
+    await this.setState(() => ({ isLoading: false }));
     console.log(this.state.varOptions);
   }
   
   async updateEntries(value: any) {
+
+    await this.setState(() => ({ disabledButton : false }));
     let tempVal = value.filter(function(value: any, index: any, arr: any){ 
       return value !== "Select a variable!";
   });
@@ -49,6 +72,7 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
   async setParams()
   {
     localStorage.setItem('parameters', JSON.stringify(this.state.entries));
+    localStorage.removeItem('rules');
 
     let params = localStorage.getItem('parameters');
     console.log("Final params in storage:");
@@ -57,8 +81,29 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
     window.location.href = "/dashboard";
   }
 
+  showSelect() {
+    
+    if( this.state.isLoading )
+        return (
+          <div style={{margin: "1em 0"}}>
+              <Icon name="refresh" size="medium" loading={this.state.isLoading}/>
+              Loading list of valid parameters...
+          </div>
+        );
+    else
+        return (
+          <Select
+              options={this.state.varOptions}
+              multiple={true}
+              fluid={true}
+              defaultValue = {storageDataParams()}
+              onChange = {(value: any) => this.updateEntries(value)}
+          />
+        );
+  }
+
   render() {
-    const { varOptions } = this.state;
+    const { disabledButton } = this.state;
     return (
       <section className="page-example-wrap new-test">
             <Grid>
@@ -94,14 +139,12 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
                     <Grid.Row>
                       <Grid.Column width={8}>
                         This form lets you enter multiple variable(s) which you want to
-                        include in the Dasboard as a parameter. You need to enter the appropiate 
-                        variable by making sure that such a parameter and it's values
-                        are valid and detected by your IoT devices. After submission of those details, 
+                        include in the Dashboard as a parameter. After submission of those details, 
                         you can view the respective plots in the chart and perform suitable analysis.
 
-                        You can also enter the details of a variable that
-                        you want to remove from the Dasboard as a parameter that
-                        are already being displayed. After submission,
+                        You can also filter out a variable by clicking on the "cross" label 
+                        of that variable that which you want to remove from the Dashboard 
+                        previously being displayed. After submission by clicking the UPDATE button,
                         you can view that it will be filtered out in our plots.
                       </Grid.Column>
                     </Grid.Row>
@@ -116,16 +159,9 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
                                 </h3>
                               </Grid.Column>
                             </Grid.Row>
-                            
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Select
-                                  options={varOptions}
-                                  multiple={true}
-                                  fluid={true}
-                                  defaultValue = {storageDataParams()}
-                                  onChange = {(value: any) => this.updateEntries(value)}
-                                />
+                                  { this.showSelect() }
                               </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
@@ -133,7 +169,7 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
                             </Grid.Row>
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Button content="Update" onClick={ () => this.setParams() } />
+                                <Button content="Update" onClick={ () => this.setParams() } disabled={disabledButton} />
                               </Grid.Column>
                             </Grid.Row>
                           </Grid>
@@ -144,9 +180,8 @@ class UpdateVariables extends React.Component<{}, { [key: string]: any }> {
                 </Grid.Column>
               </Grid.Row>
             </Grid>
+            <div style={{height: "300px"}} />
       </section>
     );
   }
 }
-
-export default UpdateVariables;

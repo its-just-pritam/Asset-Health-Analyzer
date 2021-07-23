@@ -1,23 +1,19 @@
 import { action, observable } from 'mobx'
-export default class GlobalStore{
+export default class GlobalStore {
     @observable
+    public sideBarCollapsed = false
 
-public sideBarCollapsed = false
+    @observable
+    public darkMode: boolean = window.matchMedia('(prefers-color-scheme: dark)').matches
 
-@observable
+    @action
+    toggleSideBar(state: boolean) {
+        this.sideBarCollapsed = state
+    }
 
-public darkMode: boolean = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-@action
-
-toggleSideBar(state: boolean) {
-this.sideBarCollapsed = state
-}
-
-@action
-
-toggleDarkMode(state: boolean) {
-this.darkMode = state
-}
+    @action
+    toggleDarkMode(state: boolean) {
+        this.darkMode = state
+    }
 
 }

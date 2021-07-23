@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
   Grid,
   Card,
@@ -8,8 +8,6 @@ import {
   Header,
   Carousel
 } from "@scuf/common";
-import AppHeader from "../components/Header";
-import AppFooter from "../components/Footer";
 let home1 = require("../images/home1.jpg");
 let home2 = require("../images/home2.jpg");
 let home3 = require("../images/home3.jpg");
@@ -18,25 +16,11 @@ class Home extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
-      sidebarCollapsed: false,
-      settingsCollapsed: false,
     };
   }
 
-  onCollapsedClick() {
-    this.setState((prevState) => ({
-      sidebarCollapsed: !prevState.sidebarCollapsed,
-    }));
-  }
-
-  onSettingsCollapsedClick() {
-    this.setState((prevState) => ({
-      settingsCollapsed: !prevState.settingsCollapsed,
-    }));
-  }
 
   render() {
-    const { sidebarCollapsed, settingsCollapsed } = this.state;
     return (
       <section className="page-example-wrap">
            
@@ -58,11 +42,14 @@ class Home extends React.Component<{}, { [key: string]: any }> {
                           title="Complete end-to-end Basic Analysis Features"
                           subtitle="Data Analysis Models"
                           content="These models allows us to classify innacurate 
-                          data points and forecast the upcoming values. The Analyzer 
-                          keeps all tabs over the Asset functionalities and report
-                          them to the user ensuring easy maintenance."
+                          data points of the pre existing data and forecast the 
+                          upcoming values as well as their faults. This way
+                          the Analyzer keeps all tabs over the Asset functionalities 
+                          and report them to the user ensuring easy maintenance."
                           buttonText="Learn More"
-                          clickAction={() => alert('Learn More')}
+                          clickAction={() => {
+                            return window.open('https://confluence.honeywell.com/display/ASTANLYZER/Frontend+Documentation', '_blank');
+                          }}
                       />
                       <Carousel.Slide 
                           image={home2.default}
@@ -71,7 +58,10 @@ class Home extends React.Component<{}, { [key: string]: any }> {
                           content="The dashboard will allow the user to view 
                           real-time data from the sensors of their industrial IoT 
                           devices, as well as some analytics such as its predicted 
-                          correctness and live forecasted values"
+                          correctness and live forecasted values. The user can also
+                          download and view batch data while other functionalities
+                          allows streaming of live data. The user needs to set up 
+                          the Dashboard as a pre-requisite by seleting assets and variable(s)."
                       />
                       <Carousel.Slide 
                           image={home3.default}
@@ -79,7 +69,10 @@ class Home extends React.Component<{}, { [key: string]: any }> {
                           subtitle="Major Event Popups"
                           content="Machine Learning Models are used to report 
                           possible faulty data from industrial IoT sensors and 
-                          provides alerts to the user for such detected anomalies.​"
+                          provides alerts to the user for such detected anomalies.​
+                          However the user can also set up custom rules which appears
+                          as a lower and upper plot line in the chart, ensuring
+                          data points lying within the band are valid."
                       />
                     </Carousel>
                     </Card.Content>
@@ -88,6 +81,8 @@ class Home extends React.Component<{}, { [key: string]: any }> {
                 </Grid.Column>
               </Grid.Row>
             </Grid>
+            
+            
       </section>
     );
   }

@@ -28,16 +28,21 @@ export const AppHeader = observer(() => {
  <UserProfile firstName={user?.profile.given_name || ''} lastName={user?.profile.family_name}>
     <UserProfile.Item>
         <Checkbox
-        label={'Dark Mode'}
-        checked={globalStore.darkMode}
-        onChange={() => globalStore.toggleDarkMode(!globalStore.darkMode)}
-        toggle={true}
+            label={'Dark Mode'}
+            checked={globalStore.darkMode}
+            onChange={() => globalStore.toggleDarkMode(!globalStore.darkMode)}
+            toggle={true}
         />
     </UserProfile.Item>
     <UserProfile.Item onClick={() =>push('/client-profile')}>
             Profile
     </UserProfile.Item>
-    <UserProfile.Item onClick={() => userManager.signoutRedirect()}>Logout</UserProfile.Item>
+    <UserProfile.Item onClick={() => {
+        localStorage.clear();
+        userManager.signoutRedirect();
+    }}>
+        Logout
+    </UserProfile.Item>
  </UserProfile>
  </Header>
  )

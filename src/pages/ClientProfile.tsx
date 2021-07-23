@@ -9,7 +9,6 @@ import {
   Card,
 } from "@scuf/common";
 import UserComponent from "../components/userInfo";
-// const { user } = useSSOClient();
 
 class ClientProfile extends React.Component<{}, { [key: string]: any }> {
   constructor(props: any) {
@@ -65,6 +64,7 @@ class ClientProfile extends React.Component<{}, { [key: string]: any }> {
                 </Grid.Column>
               </Grid.Row>
             </Grid>
+            <div style={{height: "300px"}} />
       </section>
     );
   }

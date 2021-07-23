@@ -5,6 +5,7 @@ import React from "react";
 export default function UserComponent() {
 
     const { user } = useSSOClient();
+    // console.log(user);
     const userName = user?.profile.name;
     const company = user?.profile.customer;
     const avatar = user?.profile.avatar;

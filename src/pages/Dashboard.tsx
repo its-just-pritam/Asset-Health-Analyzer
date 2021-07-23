@@ -1,25 +1,39 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Grid, Card, Icon, Notification, Popup, Badge } from '@scuf/common';
+import { Link, Redirect, useHistory } from 'react-router-dom';
+import { Grid, Card, Icon, Notification, Popup, Badge, Tab, Stepper, Button } from '@scuf/common';
 import ChartComp from '../components/chartComp';
 import { getPrivateRoutesList } from '../components/PrivateRoutes/PrivateRouteConfig'
-import { storageDataAssets, storageDataParams } from '../components/storage';
+import { storageDataAssets, storageDataParams, storageDataRules } from '../components/storage';
+import LiveChartComp from '../components/liveChartComp';
+import PredictChartComp from '../components/predictionChartComp';
+import { getColorsList } from '../components/colorParams';
+import { useSSOClient } from '@forge/sso-client/dist';
 
-class Dashboard extends React.Component<{}, { [key: string]: any}> {
+export default function Dashboard(props: any) {
+
+    let history = useHistory();
+    const { user } = useSSOClient();
+
+    if(user === null || ( new Date(1000 * (user.expires_at)) <= new Date() ))
+        return (
+            <Redirect to={{ pathname: "/login" }} />
+        );
+    else
+        return (
+            <DashboardClass history={history} />
+        );
+}
+
+export class DashboardClass extends React.Component<{ [key: string]: any }, { [key: string]: any}> {
     constructor(props: any) {
         super(props);
         this.state = {
-            colors: ["#E35F61", "#5E97EA", "#F3FFA1", "#FDB3F8", "#8CFF84"],
-            params: storageDataParams(),
-            assets : storageDataAssets(),
+            colors: getColorsList(),
             routes: getPrivateRoutesList(),
-            dashButtons: [
-                "Select an Asset to view it's performance on the Dashboard",
-                "Add an Event to receive notification on the Dashboard whenever it occurs",
-                "Display errors and anomalies detected during Asset analysis",
-                "Update Variables to filter the statistics on the Dashboard",
-                "Add appropiate rules to govern functionalities of Assets"
-            ]
+            assets : storageDataAssets(),
+            params: storageDataParams(),
+            limits: storageDataRules(),
+            isCardDisabled: ( storageDataAssets() === "---Select an Asset---" )? true : false,
         }
         console.log(this.state.params);
     }
@@ -29,10 +43,11 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
             <Popup className="popup-theme-wrap" 
             element={<Icon name="badge-info" root="common" />}
             position="right center" 
+            on="hover"
             hideOnScroll>
                 <Card>
                     <Card.Content>
-                        {this.state.dashButtons[pos]}
+                        {this.state.routes[pos].details}
                     </Card.Content>
                 </Card>
             </Popup>
@@ -42,137 +57,143 @@ class Dashboard extends React.Component<{}, { [key: string]: any}> {
     showParameters(item: any, index: any) {
         
         return (
-            <div style={{color: this.state.colors[index]}}>
-                {item.charAt(0).toUpperCase() + item.slice(1)}<br/><br/>
-            </div>
+            <span style={{color: this.state.colors[index], marginRight: "1em"}}>
+                {item.charAt(0).toUpperCase() + item.slice(1)}
+            </span>
         )
     }
-
-    // showAltParam() {
-
-    //     if( JSON.parse(localStorage.getItem('parameters')!).params === undefined ) return(<></>);
-    //     if( JSON.parse(localStorage.getItem('parameters')!).params[0] === undefined )
-    //         return (
-    //             <div style={{color: "#E35F61"}}>
-    //                 Select a variable!
-    //             </div>
-    //         )
-    //     else return(<></>);
-    // }
 
     showAsset() {
         let name = this.state.assets;
         console.log(this.state.assets);
         return (
             <div>
-                {name}<br/><br/>
+                {name}
             </div>
         )
     }
 
-    genNotif(item: any) {
-        return (
-            <Notification
-                hasIcon={true}
-                title= {item.title}
-                tags= {item.tags}
-                severity= {item.severity}>
-                {item.details}
-            </Notification>
-        )
+    showRules() {
+
+        if(this.state.params[0] === "Select a variable!")
+               return;
+        else
+            return this.state.params.map((item: any, index: any) => {
+
+            let variableName = item.charAt(0).toUpperCase() + item.slice(1);
+            let lowB = ( this.state.limits[`${item}`][0] === null )? "" : this.state.limits[`${item}`][0];
+            let upB = ( this.state.limits[`${item}`][1] === null )? "" : this.state.limits[`${item}`][1];
+            return (
+                <div style={{margin: "1em 0", fontSize: "18px"}}>
+                    <span style={{width: "200px"}}>{variableName}</span> : &nbsp; [ {lowB} ... {upB} ]
+                </div>
+            );
+        });
     }
     
     render() {
-        const { routes, Notif, params, assets } = this.state;
+        const { limits, isCardDisabled, routes, params } = this.state;
         return (
             <section className="page-example-wrap">
                         <Grid>
                             <Grid.Row>
-                                <Grid.Column width={10}>
-                                <div style={{marginTop: '2em'}}><h1>Asset Dashboard</h1></div>
+                                <Grid.Column width={8}>
+                                    <div style={{marginTop: '2em'}}><h1>Asset Dashboard</h1></div>
+                                </Grid.Column>
+                                <Grid.Column width={3}>
+                                    <div style={{margin: '2.5em 0 0 0', textAlign: 'right'}}>
+                                        <Button type="secondary" size="small" onClick={() => {
+                                            localStorage.removeItem('assets');
+                                            localStorage.removeItem('parameters');
+                                            localStorage.removeItem('rules');
+                                            window.location.reload();
+                                        }} >
+                                            Clear Setup
+                                        </Button>
+                                    </div>
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
-                                <Grid.Column width={4} mOrder={3} sOrder={1} >
-                                    <Card style={{height: "300px"}}>
-                                    <Card.Header title={routes[2].name}> {this.genInfo(0)} </Card.Header>
+                                <Grid.Column width={11} >
+                                    <Card>
+                                    <Card.Header title={routes[3].name}> {this.genInfo(3)} </Card.Header>
                                         <Card.Content>
-                                            <div style={{marginTop: '3em'}}></div>
+                                            <div style={{marginTop: '2em'}} />
                                             <h2>
                                                 {this.showAsset()}
                                             </h2>
                                         </Card.Content>
-                                        <Link to={routes[2].path}>
-                                            <Card.Footer>
-                                                <Icon root="common" name="caret-right" className="right"/>
-                                            </Card.Footer>
-                                        </Link>
+                                        <div style={{height: "20px"}} />
+                                        <Card.Footer>
+                                            <Button data-testid="Asset" onClick={() => this.props.history.push(routes[3].path) } type="inline">SELECT</Button>
+                                        </Card.Footer>
                                     </Card>
                                 </Grid.Column>
-                                <Grid.Column width={6} mOrder={1} sOrder={3}>
-                                    <Card style={{height: "300px"}}>
-                                        <Card.Header title='Add Events'> {this.genInfo(1)} </Card.Header>
+                                <Grid.Column width={11} >
+                                    <Card>
+                                        <Card.Header title={routes[4].name}> {this.genInfo(4)} </Card.Header>
                                         <Card.Content>
-                                            <div style={{marginTop: '3em'}}></div>
+                                            <div style={{marginTop: '2em'}} />
+                                            <h4>
+                                                {params.map((item: any, index: any) => this.showParameters(item, index))}
+                                            </h4>
                                         </Card.Content>
+                                        <div style={{height: "20px"}} />
                                         <Card.Footer>
-                                            <Icon root="common" name="caret-right" className="right"/>
+                                            <Button onClick={() => this.props.history.push(routes[4].path)} disabled={isCardDisabled} type="inline">SELECT</Button>
+                                        </Card.Footer>
+                                    </Card>
+                                </Grid.Column>
+                                <Grid.Column width={11} >
+                                    <Card>
+                                        <Card.Header title={routes[5].name}> {this.genInfo(5)} </Card.Header>
+                                        <Card.Content>
+                                            <div style={{marginTop: '2em'}} />
+                                            { this.showRules() }
+                                        </Card.Content>
+                                        <div style={{height: "20px"}} />
+                                        <Card.Footer>
+                                            <Button onClick={() => this.props.history.push(routes[5].path)} disabled={isCardDisabled} type="inline">SELECT</Button>
                                         </Card.Footer>
                                     </Card>
                                 </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
-                                <Grid.Column width={4} mOrder={2} sOrder={2}>
-                                    <Card style={{height: "300px"}}>
-                                        <Card.Header title="Show Faults"> {this.genInfo(2)} </Card.Header>
+                                <Grid.Column width={11} mWidth={11}>
+                                    <Card>
+                                        <Card.Header title={storageDataAssets()}> 
+                                            <Popup className="popup-theme-wrap" 
+                                            element={<Icon root="common" name="badge-info" />}
+                                            position="right center" 
+                                            on="hover"
+                                            hideOnScroll>
+                                                <Card>
+                                                    <Card.Content>
+                                                        <span style={{color: "#45A7EA"}}>Live Chart:</span> Stream live data points of Asset parameters <br/> <br/>
+                                                        <span style={{color: "#45A7EA"}}>Historical Chart:</span> Download batch data of previous dates <br/> <br/>
+                                                        <span style={{color: "#45A7EA"}}>Show Predictions:</span> Forecast future values of Asset parameters.
+                                                    </Card.Content>
+                                                </Card>
+                                            </Popup>
+                                        </Card.Header>
                                         <Card.Content>
-                                            <div style={{marginTop: '3em'}}></div>
+                                        <Tab defaultActiveIndex={0} >
+                                            <Tab.Pane title="Live Chart" width="3em">
+                                                <LiveChartComp />
+                                            </Tab.Pane>
+                                            <Tab.Pane title="Historical Chart">
+                                                <ChartComp />
+                                            </Tab.Pane>
+                                            <Tab.Pane title="Show Predictions">
+                                                <PredictChartComp />
+                                            </Tab.Pane>
+                                        </Tab>
                                         </Card.Content>
-                                        <Card.Footer>
-                                            <Icon root="common" name="caret-right" className="right"/>
-                                        </Card.Footer>
-                                    </Card>
-                                </Grid.Column>
-                                <Grid.Column width={3} mOrder={2} sOrder={2}>
-                                    <Card style={{height: "300px"}}>
-                                        <Card.Header title={routes[5].name}> {this.genInfo(3)} </Card.Header>
-                                        <Card.Content>
-                                            <div style={{marginTop: '3em'}}></div>
-                                            <h4>
-                                                {params.map((item: any, index: any) => this.showParameters(item, index))}
-                                            </h4>
-                                        </Card.Content>
-                                        <Link to={routes[5].path}>
-                                        <Card.Footer>
-                                            <Icon root="common" name="caret-right" className="right"/>
-                                        </Card.Footer>
-                                        </Link>
-                                    </Card>
-                                </Grid.Column>
-                                <Grid.Column width={3} mOrder={2} sOrder={2}>
-                                    <Card style={{height: "300px"}}>
-                                        <Card.Header title="Add Rules"> {this.genInfo(4)} </Card.Header>
-                                        <Card.Content>
-                                            <div style={{marginTop: '3em'}}></div>
-                                        </Card.Content>
-                                        <Card.Footer>
-                                            <Icon root="common" name="caret-right" className="right"/>
-                                        </Card.Footer>
                                     </Card>
                                 </Grid.Column>
                             </Grid.Row>
-                            {/* <Grid.Row>
-                                <Grid.Column width={10} mWidth={10}>
-                                    <div>
-                                        {Notif.map((item: any) => this.genNotif(item))}
-                                    </div>
-                                </Grid.Column>
-                            </Grid.Row> */}
-                            <ChartComp />
                         </Grid>
             </section>
         )
     }
 }
-
-export default Dashboard;

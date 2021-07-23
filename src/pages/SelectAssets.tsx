@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
   Grid,
   Icon,
@@ -9,11 +9,31 @@ import {
   Card,
 } from "@scuf/common";
 import { getPointsData, storageDataAssets } from "../components/storage";
+import { useSSOClient } from "@forge/sso-client/dist";
 
-class SelectAssets extends React.Component<{}, { [key: string]: any }> {
+export default function SelectAssets(props: any) {
+
+    const { user } = useSSOClient();
+    const token = user?.access_token!;
+
+    if(user === null || ( new Date(1000 * (user.expires_at)) <= new Date() ))
+      return (
+        <Redirect to={{ pathname: "/login" }} />
+      );
+    else
+      return (
+        <SelectAssetsClass token={token} />
+      );
+}
+
+
+class SelectAssetsClass extends React.Component<{ [key: string]: any }, { [key: string]: any }> {
   constructor(props: any) {
     super(props);
     this.state = {
+      isLoading: true,
+      token: this.props.token,
+      disabledButton: true,
       entry: {},
       varOptions: [{
         "value": "---Select an Asset---",
@@ -24,7 +44,8 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
   }
 
   async componentDidMount() {
-    let ops = await getPointsData();
+    
+    let ops = await getPointsData(this.state.token);
     let newOps: { value: string; text: string; point: number }[] = [];
 
     for( let i in ops ) {
@@ -37,6 +58,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
       newOps.push(elem);
     }
     await this.setState(() => ({ varOptions: newOps }));
+    await this.setState(() => ({ isLoading: false }));
     console.log(this.state.varOptions);
   }
 
@@ -47,6 +69,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
 
   async updateEntries(value: any) {
 
+    await this.setState(() => ({ disabledButton : false }));
     let pointID;
     this.state.varOptions.map((item: any) => {
       if( item.value === value )
@@ -65,13 +88,37 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
   async setAssets()
   {
     localStorage.setItem('assets', JSON.stringify(this.state.entry));
-    let assets = localStorage.getItem('assets');
-    console.log(JSON.parse(assets!));
+    localStorage.removeItem('parameters');
+    localStorage.removeItem('rules');
+
+    console.log(storageDataAssets());
     window.location.href = "/dashboard";
   }
 
+  showSelect() {
+    
+    if( this.state.isLoading )
+        return (
+          <div style={{margin: "1em 0"}}>
+              <Icon name="refresh" size="medium" loading={this.state.isLoading}/>
+              Loading available devices...
+          </div>
+        );
+    else
+        return (
+          <Select
+              placeholder="Pick an Asset"
+              options={this.state.varOptions}
+              multiple={false}
+              fluid={true}
+              defaultValue = {storageDataAssets()}
+              onChange = {(value: any) => this.updateEntries(value)}
+          />
+        );
+  }
+
   render() {
-    const { varOptions } = this.state;
+    const { disabledButton } = this.state;
     return (
       <section className="page-example-wrap new-test">
             <Grid>
@@ -126,14 +173,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                             </Grid.Row>
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Select
-                                  placeholder="Pick an Asset"
-                                  options={varOptions}
-                                  multiple={false}
-                                  fluid={true}
-                                  defaultValue = {storageDataAssets()}
-                                  onChange = {(value: any) => this.updateEntries(value)}
-                                />
+                                { this.showSelect() }
                               </Grid.Column>
                             </Grid.Row>
                             <Grid.Row>
@@ -141,7 +181,7 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                             </Grid.Row>
                             <Grid.Row>
                               <Grid.Column width={8}>
-                                <Button content="Lock" onClick={ () => this.setAssets() } />
+                                <Button content="Lock" onClick={ () => this.setAssets() } disabled={disabledButton} />
                               </Grid.Column>
                             </Grid.Row>
                           </Grid>
@@ -152,9 +192,8 @@ class SelectAssets extends React.Component<{}, { [key: string]: any }> {
                 </Grid.Column>
               </Grid.Row>
             </Grid>
+            <div style={{height: "300px"}} />
       </section>
     );
   }
 }
-
-export default SelectAssets;
