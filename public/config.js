@@ -1,0 +1,6 @@
+window.ENV = {
+    LAUNCHDARKLYCLIENTID: "clinentid",
+    LAUNCHDARKLYENVIRONMENTNAME: "testing",
+    LOCALYTICS_APP_KEY: "akamksh",
+    DEPENDENT_SERVICE_BASE_URL:""
+  };

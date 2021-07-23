@@ -1,0 +1,15 @@
+{
+  "name": "cs-devops-reactapp",
+  "version": "1.0.0",
+  "description": "cs-devops-reactapp",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server"
+  },
+  "author": "",
+  "license": "COPYRIGHT 2018 HONEYWELL INTERNATIONAL SARL",
+  "dependencies": {
+    "express": "^4.16.4",
+    "node-fetch": "^2.6.1"
+  }
+}
